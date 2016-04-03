@@ -20775,7 +20775,53 @@ process.umask = function() { return 0; };
 
 },{}],179:[function(require,module,exports){
 var React = require('react');
+var Actions = require('../reflux/actions.jsx');
+
+var IngredientForm = React.createClass({
+  displayName: 'IngredientForm',
+
+  getInitialState: function () {
+    return { newText: "" };
+  },
+  onClick: function (e) {
+    e.preventDefault();
+    if (this.state.newText) {
+      Actions.postIngredients(this.state.newText);
+    }
+    this.setState({ newText: "" });
+  },
+  onInputChange: function (e) {
+    this.setState({ newText: e.target.value });
+  },
+  render: function () {
+    return React.createElement(
+      'form',
+      null,
+      React.createElement(
+        'div',
+        { className: 'form-group' },
+        React.createElement('input', { className: 'form-control',
+          placeholder: 'Add Ingredient',
+          value: this.state.newText,
+          onChange: this.onInputChange })
+      ),
+      React.createElement(
+        'button',
+        { type: 'submit', className: 'btn btn-primary', onClick: this.onClick },
+        'Add Item to List'
+      )
+    );
+  }
+});
+
+module.exports = IngredientForm;
+
+},{"../reflux/actions.jsx":183,"react":157}],180:[function(require,module,exports){
+var React = require('react');
+
 var ListItem = require('./ListItem.jsx');
+var IngredientForm = require('./IngredientForm.jsx');
+
 var Reflux = require('reflux');
 var Actions = require('../reflux/actions.jsx');
 var IngredientStore = require('../reflux/ingredient-store.jsx');
@@ -20786,7 +20832,7 @@ var List = React.createClass({
   mixins: [Reflux.listenTo(IngredientStore, 'onChange')],
 
   getInitialState: function () {
-    return { ingredients: [], newText: "" };
+    return { ingredients: [] };
   },
 
   componentWillMount: function () {
@@ -20795,18 +20841,6 @@ var List = React.createClass({
 
   onChange: function (evt, ingredients) {
     this.setState({ ingredients: ingredients });
-  },
-
-  onInputChange: function (e) {
-    this.setState({ newText: e.target.value });
-  },
-
-  onClick: function (e) {
-    e.preventDefault();
-    if (this.state.newText) {
-      Actions.postIngredients(this.state.newText);
-    }
-    this.setState({ newText: "" });
   },
 
   render: function () {
@@ -20836,23 +20870,7 @@ var List = React.createClass({
         React.createElement(
           'div',
           { className: 'col-md-4' },
-          React.createElement(
-            'form',
-            null,
-            React.createElement(
-              'div',
-              { className: 'form-group' },
-              React.createElement('input', { className: 'form-control',
-                placeholder: 'Add Ingredient',
-                value: this.state.newText,
-                onChange: this.onInputChange })
-            ),
-            React.createElement(
-              'button',
-              { type: 'submit', className: 'btn btn-primary', onClick: this.onClick },
-              'Add Item to List'
-            )
-          )
+          React.createElement(IngredientForm, null)
         )
       )
     );
@@ -20861,7 +20879,7 @@ var List = React.createClass({
 
 module.exports = List;
 
-},{"../reflux/actions.jsx":182,"../reflux/ingredient-store.jsx":183,"./ListItem.jsx":180,"react":157,"reflux":174}],180:[function(require,module,exports){
+},{"../reflux/actions.jsx":183,"../reflux/ingredient-store.jsx":184,"./IngredientForm.jsx":179,"./ListItem.jsx":181,"react":157,"reflux":174}],181:[function(require,module,exports){
 var React = require('react');
 
 var ListItem = React.createClass({
@@ -20882,21 +20900,21 @@ var ListItem = React.createClass({
 
 module.exports = ListItem;
 
-},{"react":157}],181:[function(require,module,exports){
+},{"react":157}],182:[function(require,module,exports){
 var React = require('react');
 var ReactDOM = require('react-dom');
 var List = require('./components/List.jsx');
 
 ReactDOM.render(React.createElement(List, null), document.getElementById("ingredients"));
 
-},{"./components/List.jsx":179,"react":157,"react-dom":1}],182:[function(require,module,exports){
+},{"./components/List.jsx":180,"react":157,"react-dom":1}],183:[function(require,module,exports){
 var Reflux = require('reflux');
 
 var Actions = Reflux.createActions(['getIngredients', 'postIngredients']);
 
 module.exports = Actions;
 
-},{"reflux":174}],183:[function(require,module,exports){
+},{"reflux":174}],184:[function(require,module,exports){
 var Reflux = require('reflux');
 var Actions = require('./actions.jsx');
 var HTTP = require('../services/httpservice');
@@ -20935,7 +20953,7 @@ var IngredientStore = Reflux.createStore({
 
 module.exports = IngredientStore;
 
-},{"../services/httpservice":184,"./actions.jsx":182,"reflux":174}],184:[function(require,module,exports){
+},{"../services/httpservice":185,"./actions.jsx":183,"reflux":174}],185:[function(require,module,exports){
 var Fetch = require('whatwg-fetch');
 var baseUrl = 'http://localhost:6060';
 
@@ -20954,12 +20972,10 @@ var service = {
       },
       method: 'post',
       body: JSON.stringify(ingredient)
-    }).then(function (response) {
-      return response;
     });
   }
 };
 
 module.exports = service;
 
-},{"whatwg-fetch":178}]},{},[181]);
+},{"whatwg-fetch":178}]},{},[182]);

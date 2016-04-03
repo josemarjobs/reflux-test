@@ -17,8 +17,6 @@ var service = {
       },
       method: 'post',
       body: JSON.stringify(ingredient)
-    }).then(function(response) {
-      return response
     })
   }
 }
